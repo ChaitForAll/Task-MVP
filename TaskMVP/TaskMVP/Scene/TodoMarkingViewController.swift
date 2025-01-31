@@ -9,7 +9,18 @@ import UIKit
 
 final class TodoMarkingViewController: UIViewController {
     
+    // MARK: Type(s)
+    
+    typealias TodoCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, UUID>
+    typealias DiffableDataSource = UICollectionViewDiffableDataSource<Section, UUID>
+    
+    enum Section {
+        case todos
+    }
+    
     // MARK: Property(s)
+    
+    private var diffableDataSource: DiffableDataSource?
     
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
     
@@ -24,6 +35,8 @@ final class TodoMarkingViewController: UIViewController {
     
     private func configureCollectionView() {
         view.addSubview(collectionView)
+        configureDiffableDataSource()
+        collectionView.dataSource = diffableDataSource
         collectionView.backgroundColor = .systemGroupedBackground
         collectionView.collectionViewLayout = createCompositionalLayout()
         collectionView.translatesAutoresizingMaskIntoConstraints = false
@@ -39,5 +52,25 @@ final class TodoMarkingViewController: UIViewController {
         let configuration = UICollectionLayoutListConfiguration(appearance: .grouped)
         return UICollectionViewCompositionalLayout.list(using: configuration)
     }
+    
+    private func configureDiffableDataSource() {
+        let cellRegistration = createCellRegistration()
+        let dataSource = DiffableDataSource(collectionView: collectionView) {
+            collectionView, indexPath, itemIdentifier in
+            
+            collectionView.dequeueConfiguredReusableCell(
+                using: cellRegistration,
+                for: indexPath,
+                item: itemIdentifier
+            )
+        }
+        self.diffableDataSource = dataSource
+    }
+    
+    private func createCellRegistration() -> TodoCellRegistration {
+        return TodoCellRegistration {
+            cell, indexPath , itemIdentifier in
+            // TODO: Prepare Cell
+        }
+    }
 }
-
