@@ -11,19 +11,16 @@ final class TodoMarkingViewController: UIViewController {
     
     // MARK: Type(s)
     
-    typealias TodoCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, UUID>
-    typealias DiffableDataSource = UICollectionViewDiffableDataSource<Section, UUID>
-    
-    enum Section: Int {
-        case todos
-    }
+    private typealias TodoCellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, UUID>
+    private typealias DiffableDataSource = UICollectionViewDiffableDataSource<Section, UUID>
+    private enum Section: Int { case todos }
     
     // MARK: Property(s)
     
     private var diffableDataSource: DiffableDataSource?
     private var summaryHeaderView: SummaryHeaderView?
     
-    private let todoListModel = TodoListModel()
+    private let presenter = TodoListPresenter()
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
     
     // MARK: Override(s)
@@ -31,15 +28,11 @@ final class TodoMarkingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
-        configureNavigationItem()
-        updateSnapShot()
+        presenter.addDelegate(self)
+        presenter.prepareToDisplay()
     }
     
     // MARK: Private Function(s)
-    
-    private func configureNavigationItem() {
-        navigationItem.title = "My Tasks"
-    }
     
     private func configureCollectionView() {
         view.addSubview(collectionView)
@@ -128,19 +121,21 @@ final class TodoMarkingViewController: UIViewController {
     
     private func createCellRegistration() -> TodoCellRegistration {
         return TodoCellRegistration { cell, indexPath , itemIdentifier in
-            if let todoItem = self.todoListModel.item(for: itemIdentifier) {
-                var content = cell.defaultContentConfiguration()
-                content.text = todoItem.description
-                cell.contentConfiguration = content
-                cell.accessories = todoItem.isCompleted ? [.checkmark()] : []
+            guard let todoItem = self.presenter.item(for: itemIdentifier) else {
+                return
             }
+            
+            var content = cell.defaultContentConfiguration()
+            content.text = todoItem.description
+            cell.accessories = todoItem.isCompleted ? [.checkmark()] : []
+            cell.contentConfiguration = content
         }
     }
     
-    private func updateSnapShot() {
+    private func updateSnapShot(_ itemIdentifiers: [UUID]) {
         var snapShot = NSDiffableDataSourceSnapshot<Section, UUID>()
         snapShot.appendSections([.todos])
-        snapShot.appendItems(todoListModel.allTodoIdentifiers(), toSection: .todos)
+        snapShot.appendItems(itemIdentifiers, toSection: .todos)
         diffableDataSource?.apply(snapShot)
     }
 }
@@ -153,20 +148,33 @@ extension TodoMarkingViewController: UICollectionViewDelegate {
         _ collectionView: UICollectionView,
         didSelectItemAt indexPath: IndexPath
     ) {
-        
-        if let cell = collectionView.cellForItem(at: indexPath) as? UICollectionViewListCell,
-           let itemIdentifier = diffableDataSource?.itemIdentifier(for: indexPath),
-           let selectedItem = todoListModel.item(for: itemIdentifier) {
-            if selectedItem.isCompleted {
-                todoListModel.markAsTodo(selectedItem.id)
-                cell.accessories = []
-            } else {
-                todoListModel.markCompleted(selectedItem.id)
-                cell.accessories = [.checkmark()]
-            }
-            summaryHeaderView?.update(tasksCount: todoListModel.toCompleteCount)
+        if let todoIdentifier = diffableDataSource?.itemIdentifier(for: indexPath) {
+            presenter.selectTodo(todoIdentifier)
         }
-        
         collectionView.deselectItem(at: indexPath, animated: true)
+    }
+}
+
+// MARK: TooMarkingViewDelegate
+
+extension TodoMarkingViewController: TodoMarkingViewDelegate {
+    
+    func displayTodoStatusMark(_ isCompleted: Bool, taskIdentifier: UUID) {
+        if let cellIndex = diffableDataSource?.indexPath(for: taskIdentifier),
+           let cell = collectionView.cellForItem(at: cellIndex) as? UICollectionViewListCell {
+            cell.accessories = isCompleted ? [.checkmark()] : []
+        }
+    }
+    
+    func displayCompletedTodoCount(_ completedTodosCount: Int) {
+        summaryHeaderView?.update(tasksCount: completedTodosCount)
+    }
+    
+    func displayTodos(_ allTodoIdentifiers: [UUID]) {
+        updateSnapShot(allTodoIdentifiers)
+    }
+    
+    func displayTitle(_ titleString: String) {
+        navigationItem.title = titleString
     }
 }
