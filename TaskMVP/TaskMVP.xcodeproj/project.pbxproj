@@ -14,6 +14,7 @@
 		DF68DB192D4D1B1E00B27816 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DF68DB172D4D1B1E00B27816 /* LaunchScreen.storyboard */; };
 		DFAB7F482D4F25EA002560CD /* SummaryHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAB7F472D4F25EA002560CD /* SummaryHeaderView.swift */; };
 		DFAB7F502D51EBFF002560CD /* TodoListPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAB7F4F2D51EBFF002560CD /* TodoListPresenter.swift */; };
+		DFBCB1842D5B81B30035B81C /* TodoListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFBCB1832D5B81B30035B81C /* TodoListModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		DF68DB1A2D4D1B1E00B27816 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DFAB7F472D4F25EA002560CD /* SummaryHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SummaryHeaderView.swift; sourceTree = "<group>"; };
 		DFAB7F4F2D51EBFF002560CD /* TodoListPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListPresenter.swift; sourceTree = "<group>"; };
+		DFBCB1832D5B81B30035B81C /* TodoListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +92,7 @@
 				DF68DB102D4D1B1C00B27816 /* TodoMarkingViewController.swift */,
 				DFAB7F472D4F25EA002560CD /* SummaryHeaderView.swift */,
 				DFAB7F4F2D51EBFF002560CD /* TodoListPresenter.swift */,
+				DFBCB1832D5B81B30035B81C /* TodoListModel.swift */,
 			);
 			path = Scene;
 			sourceTree = "<group>";
@@ -169,6 +172,7 @@
 				DF68DB112D4D1B1C00B27816 /* TodoMarkingViewController.swift in Sources */,
 				DF68DB0D2D4D1B1C00B27816 /* AppDelegate.swift in Sources */,
 				DF68DB0F2D4D1B1C00B27816 /* SceneDelegate.swift in Sources */,
+				DFBCB1842D5B81B30035B81C /* TodoListModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

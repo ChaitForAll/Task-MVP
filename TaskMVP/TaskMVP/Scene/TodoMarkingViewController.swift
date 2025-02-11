@@ -20,7 +20,7 @@ final class TodoMarkingViewController: UIViewController {
     private var diffableDataSource: DiffableDataSource?
     private var summaryHeaderView: SummaryHeaderView?
     
-    private let presenter = TodoListPresenter()
+    private let presenter = TodoListPresenter(todoListModel: TodoListModel())
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
     
     // MARK: Override(s)
@@ -29,12 +29,35 @@ final class TodoMarkingViewController: UIViewController {
         super.viewDidLoad()
         configureCollectionView()
         presenter.addDelegate(self)
-        presenter.prepareToDisplay()
+        presenter.viewDidLoad()
     }
     
     // MARK: Private Function(s)
     
+    @objc private func didTapAddNewTodoButton() {
+        let alertController = UIAlertController(title: "Create", message: "Please type title", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "cancel", style: .cancel)
+        let createAction = UIAlertAction(title: "create", style: .default) { action in
+            if let textField = alertController.textFields?.first {
+                self.presenter.newTodo(textField.text ?? "New Todo")
+            }
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(createAction)
+        alertController.addTextField { textfield in
+            textfield.placeholder = "Task title"
+        }
+        present(alertController, animated: true)
+    }
+    
     private func configureCollectionView() {
+        let rightBarButtonItem = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(didTapAddNewTodoButton)
+        )
+        navigationItem.rightBarButtonItem = rightBarButtonItem
+        
         view.addSubview(collectionView)
         configureDiffableDataSource()
         collectionView.delegate = self
@@ -149,7 +172,7 @@ extension TodoMarkingViewController: UICollectionViewDelegate {
         didSelectItemAt indexPath: IndexPath
     ) {
         if let todoIdentifier = diffableDataSource?.itemIdentifier(for: indexPath) {
-            presenter.selectTodo(todoIdentifier)
+            presenter.select(todoIdentifier)
         }
         collectionView.deselectItem(at: indexPath, animated: true)
     }
@@ -176,5 +199,13 @@ extension TodoMarkingViewController: TodoMarkingViewDelegate {
     
     func displayTitle(_ titleString: String) {
         navigationItem.title = titleString
+    }
+    
+    func displayNewTodo(_ newTodoIdentifier: UUID) {
+        guard var snapshot = diffableDataSource?.snapshot() else {
+            return
+        }
+        snapshot.appendItems([newTodoIdentifier])
+        diffableDataSource?.apply(snapshot)
     }
 }
