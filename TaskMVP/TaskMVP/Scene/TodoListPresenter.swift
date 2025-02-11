@@ -7,12 +7,6 @@
 
 import Foundation
 
-struct Todo: Identifiable {
-    let id: UUID = .init()
-    let description: String
-    var isCompleted: Bool = false
-}
-
 protocol TodoMarkingViewDelegate: AnyObject {
     func displayTitle(_ titleString: String)
     func displayTodos(_ allTodoIdentifiers: [UUID])
