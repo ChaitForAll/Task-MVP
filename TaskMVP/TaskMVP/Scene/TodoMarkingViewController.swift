@@ -28,6 +28,7 @@ final class TodoMarkingViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureCollectionView()
+        configureNavigationItems()
         presenter.addDelegate(self)
         presenter.viewDidLoad()
     }
@@ -50,13 +51,16 @@ final class TodoMarkingViewController: UIViewController {
         present(alertController, animated: true)
     }
     
-    private func configureCollectionView() {
+    private func configureNavigationItems() {
         let rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
             action: #selector(didTapAddNewTodoButton)
         )
         navigationItem.rightBarButtonItem = rightBarButtonItem
+    }
+    
+    private func configureCollectionView() {
         
         view.addSubview(collectionView)
         configureDiffableDataSource()
