@@ -30,14 +30,11 @@ final class SummaryHeaderView: UICollectionReusableView {
     
     // MARK: Function(s)
     
-    func update(tasksCount: Int) {
-        self.tasksCount = tasksCount
-        if tasksCount == .zero {
-            resultLabel.text = "👏"
-            resultLabel.backgroundColor = .systemGreen.withAlphaComponent(0.43)
-        } else {
-            resultLabel.text = "\(tasksCount)"
-            resultLabel.backgroundColor = .systemRed.withAlphaComponent(0.43)
+    func update(text: String, statusStyle: TodoListDisplayStyle) {
+        resultLabel.text = text
+        switch statusStyle {
+        case .incomplete: resultLabel.backgroundColor = .systemRed.withAlphaComponent(0.43)
+        case .allCompleted: resultLabel.backgroundColor = .systemGreen.withAlphaComponent(0.43)
         }
     }
     

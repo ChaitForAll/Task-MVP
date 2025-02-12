@@ -7,12 +7,17 @@
 
 import Foundation
 
+enum TodoListDisplayStyle {
+    case incomplete
+    case allCompleted
+}
+
 protocol TodoMarkingViewDelegate: AnyObject {
     func displayTitle(_ titleString: String)
     func displayTodos(_ allTodoIdentifiers: [UUID])
     func displayNewTodo(_ newTodoIdentifier: UUID)
-    func displayTodoStatusMark(_ isCompleted: Bool, taskIdentifier: UUID)
-    func displayCompletedTodoCount(_ completedTodosCount: Int)
+    func displayTodoMark(_ shouldMark: Bool, taskIdentifier: UUID)
+    func displayTodoListStatus(_ text: String, _ displayStyle: TodoListDisplayStyle)
 }
 
 final class TodoListPresenter {
@@ -47,13 +52,19 @@ final class TodoListPresenter {
         if var selectedTodo = todoListModel.item(for: itemIdentifier) {
             selectedTodo.isCompleted = selectedTodo.isCompleted ? false : true
             todoListModel.update(selectedTodo)
-            viewDelegate?.displayTodoStatusMark(selectedTodo.isCompleted, taskIdentifier: selectedTodo.id)
-            viewDelegate?.displayCompletedTodoCount(todoListModel.currentCompletedCount())
+            viewDelegate?.displayTodoMark(selectedTodo.isCompleted, taskIdentifier: selectedTodo.id)
+            updateCompletedCount()
         }
     }
     
     func newTodo(_ newTodoTitle: String) {
         let createdTodoIdentifier = todoListModel.create(newTodoTitle)
         viewDelegate?.displayNewTodo(createdTodoIdentifier)
+    }
+    
+    func updateCompletedCount() {
+        let displayStyle: TodoListDisplayStyle  = todoListModel.currentCompletedCount() > 0 ? .incomplete : .allCompleted
+        let displayText = displayStyle == .allCompleted ? "👏" : String(todoListModel.currentCompletedCount())
+        viewDelegate?.displayTodoListStatus(displayText, displayStyle)
     }
 }

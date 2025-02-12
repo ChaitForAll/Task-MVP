@@ -33,6 +33,11 @@ final class TodoMarkingViewController: UIViewController {
         presenter.viewDidLoad()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        presenter.updateCompletedCount()
+    }
+    
     // MARK: Private Function(s)
     
     @objc private func didTapAddNewTodoButton() {
@@ -135,12 +140,7 @@ final class TodoMarkingViewController: UIViewController {
         return .init(elementKind: UICollectionView.elementKindSectionFooter) {
             supplementaryView, elementKind, indexPath in
             
-            guard let snapShot = self.diffableDataSource?.snapshot() else {
-                supplementaryView.update(tasksCount: .zero)
-                return
-            }
-            
-            supplementaryView.update(tasksCount: snapShot.itemIdentifiers.count)
+            self.presenter.updateCompletedCount()
             
             self.summaryHeaderView = supplementaryView
         }
@@ -186,15 +186,15 @@ extension TodoMarkingViewController: UICollectionViewDelegate {
 
 extension TodoMarkingViewController: TodoMarkingViewDelegate {
     
-    func displayTodoStatusMark(_ isCompleted: Bool, taskIdentifier: UUID) {
+    func displayTodoMark(_ shouldMark: Bool, taskIdentifier: UUID) {
         if let cellIndex = diffableDataSource?.indexPath(for: taskIdentifier),
            let cell = collectionView.cellForItem(at: cellIndex) as? UICollectionViewListCell {
-            cell.accessories = isCompleted ? [.checkmark()] : []
+            cell.accessories = shouldMark ? [.checkmark()] : []
         }
     }
     
-    func displayCompletedTodoCount(_ completedTodosCount: Int) {
-        summaryHeaderView?.update(tasksCount: completedTodosCount)
+    func displayTodoListStatus(_ text: String, _ statusStyle: TodoListDisplayStyle) {
+        summaryHeaderView?.update(text: text, statusStyle: statusStyle)
     }
     
     func displayTodos(_ allTodoIdentifiers: [UUID]) {
